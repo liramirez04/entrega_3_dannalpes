@@ -34,7 +34,10 @@ def inicio():
 # POST /reviews
 @app.post('/reviews')
 def post_review(datos: dict):
-    existente = db["Reviews"].find_one({"id_reserva": datos["id_reserva"]})
+    existente = db["Reviews"].find_one({
+        "id_reserva": datos["id_reserva"],
+        "estado": "publicada"
+    })
     if existente:
         return {"error": "Ya existe una reseña para esta reserva"}
     
