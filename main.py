@@ -73,11 +73,12 @@ def eliminar_review(review_id: str):
 # GET /hotels/{hotel_id}/reviews
 @app.get("/hotels/{hotel_id}/reviews")
 def get_reviews_hotel(hotel_id: int):
-    reviews = list(db["Reviews"].find(
-        {"id_hotel": hotel_id, "estado": "publicada"},
-        {"_id": 0}
+    resenas = list(db["Reviews"].find(
+        {"id_hotel": hotel_id, "estado": "publicada"}
     ).sort([("destacada", -1), ("fecha_creacion", -1)]))
-    return reviews or []
+    for r in resenas:
+        r["_id"] = str(r["_id"])
+    return resenas or []
  
 # RF5
 # POST /reviews/{review_id}/vote
