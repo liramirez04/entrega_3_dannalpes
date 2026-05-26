@@ -110,7 +110,16 @@ def get_reviews_cliente(doc_identidad: str):
     for r in resenas:
         r["_id"] = str(r["_id"])
     return resenas or []
- 
+    
+#Reseñas sin filtro
+@app.get("/admin/reviews")
+def get_all_reviews():
+    resenas = list(db["Reviews"].find(
+        {"estado": "publicada"}
+    ).sort([("id_hotel", 1), ("fecha_creacion", -1)]))
+    for r in resenas:
+        r["_id"] = str(r["_id"])
+    return resenas or []
  
 # RF7
 # PUT /reviews/{review_id}/response
