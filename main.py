@@ -154,24 +154,25 @@ def destacar_review(review_id: str):
 # RFC1
 # GET /analytics/top-hotels
 @app.get("/analytics/top-hotels")
-def top_hoteles(desde: str = "2025-01-01", hasta: str = "2025-12-31"):
+def top_hoteles(desde: str = "2024-01-01", hasta: str = "2026-12-31"):
     resultado = list(db["Reviews"].aggregate([
         {"$match": {
             "estado": "publicada",
-            "fecha_creacion": {"$gte": desde, "$lte": hasta + "T23:59:59"}
+            "fecha_creacion": {
+                "$gte": datetime.fromisoformat(desde),
+                "$lte": datetime.fromisoformat(hasta + "T23:59:59")
+            }
         }},
         {"$group": {
             "_id": "$id_hotel",
             "calificacion_promedio": {"$avg": "$calificacion"},
-            "total_resenas": {"$sum": 1},
-            "total_votos_utilidad": {"$sum": {"$size": {"$ifNull": ["$votos_utilidad", []]}}}
+            "total_resenas": {"$sum": 1}
         }},
         {"$project": {
             "_id": 0,
             "id_hotel": "$_id",
             "calificacion_promedio": {"$round": ["$calificacion_promedio", 2]},
-            "total_resenas": 1,
-            "total_votos_utilidad": 1
+            "total_resenas": 1
         }},
         {"$sort": {"calificacion_promedio": -1, "total_resenas": -1}},
         {"$limit": 10}
@@ -183,13 +184,11 @@ def top_hoteles(desde: str = "2025-01-01", hasta: str = "2025-12-31"):
 # GET /analytics/hotel/{hotel_id}/evolution?anio=2025
 @app.get("/analytics/hotel/{hotel_id}/evolution")
 def evolucion_hotel(hotel_id: int, anio: int = 2025):
-    desde = f"{anio}-01-01T00:00:00"
-    hasta = f"{anio}-12-31T23:59:59"
     resultado = list(db["Reviews"].aggregate([
         {"$match": {
             "id_hotel": hotel_id,
             "estado": "publicada",
-            "fecha_creacion": {"$gte": desde, "$lte": hasta}
+            "$expr": {"$eq": [{"$year": "$fecha_creacion"}, anio]}
         }},
         {"$group": {
             "_id": {
@@ -261,3 +260,4 @@ def comparativa_ciudad_promedio(hotel_ids: str):
         }}
     ]))
     return resultado[0] if resultado else {"promedio_ciudad": 0}
+ 
