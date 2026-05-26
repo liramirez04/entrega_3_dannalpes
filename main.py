@@ -101,9 +101,10 @@ def votar_review(review_id: str, datos: dict):
 @app.get("/clients/{doc_identidad}/reviews")
 def get_reviews_cliente(doc_identidad: str):
     resenas = list(db["Reviews"].find(
-        {"documento_identidad_cliente": doc_identidad},
-        {"_id": 0}
+        {"documento_identidad_cliente": doc_identidad}
     ).sort("fecha_creacion", -1))
+    for r in resenas:
+        r["_id"] = str(r["_id"])
     return resenas or []
  
  
