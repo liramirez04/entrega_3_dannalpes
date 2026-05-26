@@ -38,7 +38,7 @@ def post_review(datos: dict):
     if existente:
         return {"error": "Ya existe una reseña para esta reserva"}
     
-    datos["fecha_creacion"] = datetime.now().isoformat()
+    datos["fecha_creacion"] = datetime.now()
     datos["estado"] = "publicada"
     datos["destacada"] = False
     datos["votos_utilidad"] = []
@@ -49,7 +49,7 @@ def post_review(datos: dict):
 # PUT /reviews/{review_id}
 @app.put("/reviews/{review_id}")
 def editar_review(review_id: str, datos: dict):
-    datos["fecha_edicion"] = datetime.now().isoformat()
+    datos["fecha_edicion"] = datetime.now()
     db["Reviews"].update_one(
         {"_id": ObjectId(review_id)},
         {"$set": datos}
@@ -116,7 +116,7 @@ def responder_review(review_id: str, datos: dict):
         {"$set": {
             "respuesta_admin": {
                 "texto_respuesta": datos["texto_respuesta"],
-                "fecha_respuesta": datetime.now().isoformat()
+                "fecha_respuesta": datetime.now()
             }
         }}
     )
